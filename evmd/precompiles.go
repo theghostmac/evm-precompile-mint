@@ -15,6 +15,7 @@ import (
 	distprecompile "github.com/cosmos/evm/precompiles/distribution"
 	govprecompile "github.com/cosmos/evm/precompiles/gov"
 	ics20precompile "github.com/cosmos/evm/precompiles/ics20"
+	mintprecompile "github.com/cosmos/evm/precompiles/mint"
 	"github.com/cosmos/evm/precompiles/p256"
 	slashingprecompile "github.com/cosmos/evm/precompiles/slashing"
 	stakingprecompile "github.com/cosmos/evm/precompiles/staking"
@@ -161,6 +162,14 @@ func NewAvailableStaticPrecompiles(
 		panic(fmt.Errorf("failed to instantiate slashing precompile: %w", err))
 	}
 
+	mintPrecompile, err := mintprecompile.NewPrecompile(
+		"", // todo: how to get actual authority address?
+		bankKeeper,
+	)
+	if err != nil {
+		panic(fmt.Errorf("failed to instantiate mint precompile: %w", err))
+	}
+
 	// Stateless precompiles
 	precompiles[bech32Precompile.Address()] = bech32Precompile
 	precompiles[p256Precompile.Address()] = p256Precompile
@@ -172,6 +181,7 @@ func NewAvailableStaticPrecompiles(
 	precompiles[bankPrecompile.Address()] = bankPrecompile
 	precompiles[govPrecompile.Address()] = govPrecompile
 	precompiles[slashingPrecompile.Address()] = slashingPrecompile
+	precompiles[mintPrecompile.Address()] = mintPrecompile
 
 	return precompiles
 }
