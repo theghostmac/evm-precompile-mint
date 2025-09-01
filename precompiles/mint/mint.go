@@ -47,3 +47,13 @@ func NewPrecompile(authority string, bankKeeper cmn.BankKeeper) (*Precompile, er
 
 	return p, nil
 }
+
+func (p Precompile) RequiredGas(input []byte) uint64 {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
+	//TODO implement me
+	panic("implement me")
+}
