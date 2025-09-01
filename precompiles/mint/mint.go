@@ -49,13 +49,14 @@ func NewPrecompile(authority string, bankKeeper cmn.BankKeeper) (*Precompile, er
 	}
 
 	// Set the address of the Mint precompile contract. would use 0x1111 for easy testing
+	// TODO:
 	p.SetAddress(common.HexToAddress("0x0000000000000000000000000000000000001111"))
 
 	return p, nil
 }
 
 // RequiredGas calculates the contract gas used.
-func (p Precompile) RequiredGas(input []byte) uint64 {
+func (p *Precompile) RequiredGas(input []byte) uint64 {
 	if len(input) < 4 {
 		return 0
 	}
@@ -75,7 +76,7 @@ func (p Precompile) RequiredGas(input []byte) uint64 {
 }
 
 // Run executes the precompiled contract Mint method defined in the ABI.
-func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) (bz []byte, err error) {
+func (p *Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) (bz []byte, err error) {
 	bz, err = p.run(evm, contract, readonly)
 	if err != nil {
 		return cmn.ReturnRevertError(evm, err)
@@ -84,7 +85,7 @@ func (p Precompile) Run(evm *vm.EVM, contract *vm.Contract, readonly bool) (bz [
 	return bz, nil
 }
 
-func (p Precompile) run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
+func (p *Precompile) run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]byte, error) {
 	// Mint precompile cannot receive funds.
 	if value := contract.Value(); value.Sign() == 1 {
 		return nil, fmt.Errorf(ErrCannotReceiveFunds, contract.Value().String())
@@ -113,7 +114,7 @@ func (p Precompile) run(evm *vm.EVM, contract *vm.Contract, readonly bool) ([]by
 }
 
 // IsTransaction checks if the given method name corresponds to a transaction or query.
-func (Precompile) IsTransaction(method *abi.Method) bool {
+func (p *Precompile) IsTransaction(method *abi.Method) bool {
 	switch method.Name {
 	case MintMethod:
 		return true

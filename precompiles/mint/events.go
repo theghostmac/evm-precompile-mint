@@ -19,7 +19,7 @@ const (
 )
 
 // EmitMintEvent creates a new Mint event emitted on mint transactions
-func (p Precompile) EmitMintEvent(ctx sdk.Context, stateDB vm.StateDB, to common.Address, token string, value *big.Int) error {
+func (p *Precompile) EmitMintEvent(ctx sdk.Context, stateDB vm.StateDB, to common.Address, token string, value *big.Int) error {
 	// Prepare the event topics
 	event := p.Events[EventTypeMint]
 	topics := make([]common.Hash, 2)
