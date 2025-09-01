@@ -3,10 +3,11 @@ package mint
 import "errors"
 
 const (
-	ErrInvalidRecipient = "invalid recipient address: %s"
-	ErrInvalidDenom     = "invalid token denomination: %s"
-	ErrMintFailed       = "failed to mint tokens: %s"
-	ErrTransferFailed   = "failed to transfer tokens: %s"
+	ErrCannotReceiveFunds = "cannot receive funds, received: %s"
+	ErrInvalidRecipient   = "invalid recipient address: %s"
+	ErrInvalidDenom       = "invalid token denomination: %s"
+	ErrMintFailed         = "failed to mint tokens: %s"
+	ErrTransferFailed     = "failed to transfer tokens: %s"
 )
 
 var (
