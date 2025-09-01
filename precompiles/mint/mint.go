@@ -26,7 +26,8 @@ const (
 )
 
 // Embed abi json file to the executable binary.
-// go:embed abi.json
+//
+//go:embed abi.json
 var f embed.FS
 
 var _ vm.PrecompiledContract = &Precompile{}
