@@ -3,6 +3,7 @@ package mint
 import (
 	"fmt"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -32,6 +33,44 @@ func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.Sta
 	if !p.isValidRecipient(ctx, to) {
 		return nil, fmt.Errorf(ErrInvalidRecipient, to.Hex())
 	}
+
+	// Convert amount to SDK Int
+	amount := math.NewIntFromBigInt(value)
+	if amount.IsZero() {
+		return nil, ErrZeroAmount
+	}
+	if amount.IsNegative() {
+		return nil, ErrNegativeAmount
+	}
+
+	// Create coin to mint
+	coin := sdk.NewCoin(token, amount)
+	coins := sdk.NewCoins(coin)
+
+	// Validate coin denomination
+	if err := coin.Validate(); err != nil {
+		return nil, fmt.Errorf(ErrInvalidDenom, token)
+	}
+
+	// MINTING TOKENS USING THE BANK KEEPER
+
+	// Mint coins to temporary module account.
+	if err := p.bankKeeper.MintCoins(ctx, "mint", coins); err != nil {
+		return nil, fmt.Errorf(ErrMintFailed, err.Error())
+	}
+
+	// Send minted coins to recipient
+	recipientAddr := sdk.AccAddress(to.Bytes())
+	if err := p.bankKeeper.SendCoinsFromModuleToAccount(ctx, "mint", recipientAddr, coins); err != nil {
+		return nil, fmt.Errorf(ErrTransferFailed, err.Error())
+	}
+
+	// Emit mint event
+	if err := p.EmitMintEvent(ctx, stateDB, to, token, value); err != nil {
+		return nil, err
+	}
+
+	return method.Outputs.Pack()
 }
 
 // isAuthorized checks if the caller is the authorized admin.
