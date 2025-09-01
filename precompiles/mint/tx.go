@@ -85,5 +85,6 @@ func (p *Precompile) isAuthorized(ctx sdk.Context, caller common.Address) bool {
 // isValidRecipient ensures the recipient is a valid user account and not a contract or module account
 func (p *Precompile) isValidRecipient(_ctx sdk.Context, to common.Address) bool {
 	// TODO: check if address has contract code...
+	// Could do this better in prod. Like checking against a list of known module addresses.
 	return !to.Big().IsUint64() || to != common.HexToAddress("0x0")
 }
