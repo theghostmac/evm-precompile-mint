@@ -9,6 +9,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 )
 
+// Precompile defines the precompiled contract for Mint.
+type Precompile struct {
+	cmn.Precompile
+	authority  string
+	bankKeeper cmn.BankKeeper
+}
+
 const (
 	abiPath = "abi.json"
 	GasMint = 25_000
