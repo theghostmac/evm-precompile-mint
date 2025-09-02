@@ -19,7 +19,7 @@ const (
 func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.StateDB, method *abi.Method, args []interface{}) ([]byte, error) {
 	// First check if the caller is authorized
 	caller := contract.Caller()
-	if !p.isAuthorized(ctx, caller) {
+	if !p.IsAuthorized(ctx, caller) {
 		return nil, ErrUnauthorized
 	}
 
@@ -30,7 +30,7 @@ func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.Sta
 	}
 
 	// Validate recipient address
-	if !p.isValidRecipient(ctx, to) {
+	if !p.IsValidRecipient(ctx, to) {
 		return nil, fmt.Errorf(ErrInvalidRecipient, to.Hex())
 	}
 
@@ -73,8 +73,8 @@ func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.Sta
 	return method.Outputs.Pack()
 }
 
-// isAuthorized checks if the caller is the authorized admin.
-func (p *Precompile) isAuthorized(ctx sdk.Context, caller common.Address) bool {
+// IsAuthorized checks if the caller is the authorized admin.
+func (p *Precompile) IsAuthorized(ctx sdk.Context, caller common.Address) bool {
 	// Convert EVM address to bech32 for comparison
 	callerBech32 := sdk.AccAddress(caller.Bytes()).String()
 
@@ -82,8 +82,8 @@ func (p *Precompile) isAuthorized(ctx sdk.Context, caller common.Address) bool {
 	return caller.Hex() == p.authority || callerBech32 == p.authority
 }
 
-// isValidRecipient ensures the recipient is a valid user account and not a contract or module account
-func (p *Precompile) isValidRecipient(_ctx sdk.Context, to common.Address) bool {
+// IsValidRecipient ensures the recipient is a valid user account and not a contract or module account
+func (p *Precompile) IsValidRecipient(_ctx sdk.Context, to common.Address) bool {
 	// TODO: check if address has contract code...
 	// Could do this better in prod. Like checking against a list of known module addresses.
 	return !to.Big().IsUint64() || to != common.HexToAddress("0x0")
