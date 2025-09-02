@@ -2,8 +2,8 @@ package mint
 
 import (
 	"github.com/cosmos/evm/precompiles/mint"
-	"github.com/cosmos/evm/testutil/integration/base/grpc"
 	"github.com/cosmos/evm/testutil/integration/evm/factory"
+	"github.com/cosmos/evm/testutil/integration/evm/grpc"
 	"github.com/cosmos/evm/testutil/integration/evm/network"
 	testkeyring "github.com/cosmos/evm/testutil/keyring"
 	"github.com/stretchr/testify/suite"
