@@ -163,7 +163,7 @@ func NewAvailableStaticPrecompiles(
 	}
 
 	mintPrecompile, err := mintprecompile.NewPrecompile(
-		"", // todo: how to get actual authority address?
+		"cosmos1wskv7h9wrxdkzr8npq8g4juh4etm9khqxvcje4", // todo: hardcoded random for tests, update this.
 		bankKeeper,
 	)
 	if err != nil {

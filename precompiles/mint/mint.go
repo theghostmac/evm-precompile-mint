@@ -141,3 +141,8 @@ func (p *Precompile) HandleMethod(
 
 	return bz, err
 }
+
+// GetAuthority returns the authority address for testing purposes
+func (p *Precompile) GetAuthority() string {
+	return p.authority
+}
