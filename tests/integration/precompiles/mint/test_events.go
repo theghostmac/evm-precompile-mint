@@ -50,12 +50,12 @@ func (s *PrecompileTestSuite) TestEmitMintEvent() {
 			log := stateDB.Logs()[0]
 			s.Require().Equal(log.Address, s.precompile.Address())
 
-			// Check that the event signature matches the one emitted
+			// Check event signature matches the one emitted
 			event := s.precompile.Events[mint.EventTypeMint]
 			s.Require().Equal(crypto.Keccak256Hash([]byte(event.Sig)), common.HexToHash(log.Topics[0].Hex()))
 			s.Require().Equal(log.BlockNumber, uint64(s.network.GetContext().BlockHeight()))
 
-			// Check that the  unpacked event matches the one emitted.
+			// Check the fully unpacked event matches the one emitted
 			var mintEvent mint.EventMint
 			err = cmn.UnpackLog(s.precompile.ABI, &mintEvent, mint.EventTypeMint, *log)
 			s.Require().NoError(err, "unable to unpack log into mint event")
