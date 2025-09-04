@@ -17,6 +17,9 @@ var (
 )
 
 func (s *PrecompileTestSuite) TestMint() {
+	// Once setup for all test cases!
+	s.SetupTest()
+
 	method := s.precompile.Methods[mint.MintMethod]
 	admin := s.keyring.GetKey(0)    // first key is the authority/admin
 	nonAdmin := s.keyring.GetKey(1) // second key is a non-admin user
@@ -102,37 +105,26 @@ func (s *PrecompileTestSuite) TestMint() {
 			errContains: "invalid token denomination",
 		},
 		{
-			name:   "fail - minting not implemented (current state)",
+			name:   "pass - successful mint",
 			caller: admin.Addr,
 			malleate: func() []interface{} {
 				return []interface{}{toAddr, "umint", big.NewInt(1000)}
 			},
-			expErr:      true,
-			errContains: "minting not implemented",
+			postCheck: func() {
+				// Check that tokens were minted
+				balance := s.network.App.GetBankKeeper().GetBalance(
+					s.network.GetContext(),
+					toAddr.Bytes(),
+					"umint",
+				)
+				s.Require().Equal(big.NewInt(1000), balance.Amount.BigInt(), "expected tokens to be minted")
+			},
+			expErr: false,
 		},
-		// TODO: uncomment when minting is properly implemented
-		// {
-		// 	name:   "pass - successful mint",
-		// 	caller: admin.Addr,
-		// 	malleate: func() []interface{} {
-		// 		return []interface{}{toAddr, "umint", big.NewInt(1000)}
-		// 	},
-		// 	postCheck: func() {
-		// 		// Check that tokens were minted
-		// 		balance := s.network.App.GetBankKeeper().GetBalance(
-		// 			s.network.GetContext(),
-		// 			toAddr.Bytes(),
-		// 			"umint",
-		// 		)
-		// 		s.Require().Equal(big.NewInt(1000), balance.Amount.BigInt(), "expected tokens to be minted")
-		// 	},
-		// 	expErr: false,
-		// },
 	}
 
 	for _, tc := range testcases {
 		s.Run(tc.name, func() {
-			s.SetupTest()
 			stateDB := s.network.GetStateDB()
 
 			var contract *vm.Contract

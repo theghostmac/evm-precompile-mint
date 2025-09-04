@@ -17,12 +17,6 @@ const (
 
 // Mint mints native tokens to the specified address
 func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.StateDB, method *abi.Method, args []interface{}) ([]byte, error) {
-	// First check if the caller is authorized
-	caller := contract.Caller()
-	if !p.IsAuthorized(ctx, caller) {
-		return nil, ErrUnauthorized
-	}
-
 	// Parse arguments
 	to, token, value, err := ParseMintArgs(args)
 	if err != nil {
@@ -34,7 +28,12 @@ func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.Sta
 		return nil, fmt.Errorf(ErrInvalidRecipient, to.Hex())
 	}
 
-	// Convert amount to SDK Int
+	// Validating token denomination first before creating coin to avoid panic
+	if token == "" {
+		return nil, fmt.Errorf(ErrInvalidDenom, token)
+	}
+
+	// Convert amount to SDK Int and validate
 	amount := math.NewIntFromBigInt(value)
 	if amount.IsZero() {
 		return nil, ErrZeroAmount
@@ -43,14 +42,20 @@ func (p *Precompile) Mint(ctx sdk.Context, contract *vm.Contract, stateDB vm.Sta
 		return nil, ErrNegativeAmount
 	}
 
-	// Create coin to mint
+	// Create coin to mint and validate denomination
 	coin := sdk.NewCoin(token, amount)
-	coins := sdk.NewCoins(coin)
-
-	// Validate coin denomination
 	if err := coin.Validate(); err != nil {
 		return nil, fmt.Errorf(ErrInvalidDenom, token)
 	}
+
+	// now we can check if the caller is authorized (after all validation passes)
+	caller := contract.Caller()
+	if !p.IsAuthorized(ctx, caller) {
+		return nil, ErrUnauthorized
+	}
+
+	// now we create the coins to mint.
+	coins := sdk.NewCoins(coin)
 
 	// MINTING TOKENS USING THE BANK KEEPER
 
@@ -78,8 +83,17 @@ func (p *Precompile) IsAuthorized(ctx sdk.Context, caller common.Address) bool {
 	// Convert EVM address to bech32 for comparison
 	callerBech32 := sdk.AccAddress(caller.Bytes()).String()
 
+	// DEBUG: just printing values for debugging
+	fmt.Printf("DEBUG: caller.Hex(): %s\n", caller.Hex())
+	fmt.Printf("DEBUG: callerBech32: %s\n", callerBech32)
+	fmt.Printf("DEBUG: p.authority: %s\n", p.authority)
+	fmt.Printf("DEBUG: hex comparison: %v\n", caller.Hex() == p.authority)
+	fmt.Printf("DEBUG: bech32 comparison: %v\n", callerBech32 == p.authority)
+
 	// Support both hex and bech32 formats
-	return caller.Hex() == p.authority || callerBech32 == p.authority
+	result := caller.Hex() == p.authority || callerBech32 == p.authority
+	fmt.Printf("DEBUG: final result: %v\n", result)
+	return result
 }
 
 // IsValidRecipient ensures the recipient is a valid user account and not a contract or module account
