@@ -26,19 +26,19 @@ func ParseMintArgs(args []interface{}) (
 	// Parse "to" address
 	to, ok := args[0].(common.Address)
 	if !ok {
-		return common.Address{}, "", nil, fmt.Errorf("invalid `to` address: %v", args[0])
+		return common.Address{}, "", nil, fmt.Errorf("invalid to address: %v", args[0])
 	}
 
 	// Parse 'token' string
 	token, ok = args[1].(string)
 	if !ok {
-		return common.Address{}, "", nil, fmt.Errorf("invalid `token`: %v", args[1])
+		return common.Address{}, "", nil, fmt.Errorf("invalid token: %v", args[1])
 	}
 
 	// And finally parse 'value' big.Int
 	value, ok = args[2].(*big.Int)
 	if !ok {
-		return common.Address{}, "", nil, fmt.Errorf("invalid `value`: %v", args[2])
+		return common.Address{}, "", nil, fmt.Errorf("invalid value: %v", args[2])
 	}
 
 	return to, token, value, nil
