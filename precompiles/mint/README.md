@@ -1,4 +1,25 @@
+## EVM Mint Precompile
 
+## What I built
+A custom EVM precompile that allows authorized account to mint native Cosmos tokens.
+
+Features:
+- admin-only minting with authorized checks. supports hex and bech32 formats
+- input validation
+- native Cosmos SDK token integration via BankKeeper
+- EVM event logging
+
+
+## How to Test/Run
+Only testing applicable:
+```bash
+go test ./...
+```
+
+`TestMint()` contains the main minting logic with some failure and a success case.
+`TestIsAuthorized()` handles authorization logic
+`TestIsValidRecipient()` handles address validation (limited)
+`TestEmitMintEvent()` checks that events are emitted.
 
 ## Challenges
 
@@ -22,4 +43,3 @@
 
 - using the 0x1111 address for now, for easy test and memorizing.
 - hardcoded the authority admin address for now for simplicity.
-- 
