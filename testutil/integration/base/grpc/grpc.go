@@ -1,14 +1,13 @@
 package grpc
 
 import (
-	"github.com/cosmos/evm/testutil/integration/base/network"
-	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/evm/testutil/integration/base/network"
+	precisebanktypes "github.com/cosmos/evm/x/precisebank/types"
 )
 
 // Handler is an interface that defines the common methods that are used to query
